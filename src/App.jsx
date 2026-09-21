@@ -1,0 +1,408 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { EMOTIONS } from './data/emotions';
+import { analyzeImage, generateFeedback } from './services/api';
+
+const emptyResult = {
+  label: '',
+  confidence: 0,
+  all_probs: {},
+};
+
+const EMOTION_THEMES = {
+  happy: { accent: '#ffb547', accentStrong: '#e78319', glow: 'rgba(255, 181, 71, 0.24)' },
+  sad: { accent: '#38bdf8', accentStrong: '#1676b6', glow: 'rgba(56, 189, 248, 0.22)' },
+  angry: { accent: '#ff6b6b', accentStrong: '#c84350', glow: 'rgba(255, 107, 107, 0.23)' },
+  fear: { accent: '#9b8cff', accentStrong: '#6554c0', glow: 'rgba(155, 140, 255, 0.24)' },
+  surprise: { accent: '#f472b6', accentStrong: '#d2448a', glow: 'rgba(244, 114, 182, 0.22)' },
+  neutral: { accent: '#67d4d1', accentStrong: '#299794', glow: 'rgba(103, 212, 209, 0.2)' },
+  disgust: { accent: '#67c587', accentStrong: '#318b55', glow: 'rgba(103, 197, 135, 0.22)' },
+};
+
+function getTheme(emotion) {
+  return EMOTION_THEMES[emotion?.key] || EMOTION_THEMES.neutral;
+}
+
+function emotionKeyFromLabel(label) {
+  const match = EMOTIONS.find((emotion) => emotion.name.toLowerCase() === label?.toLowerCase());
+  return match?.key || 'neutral';
+}
+
+function FaceCueVisual({ emotion, compact = false }) {
+  const theme = getTheme(emotion);
+
+  return (
+    <div
+      className={`face-visual ${emotion.key} ${compact ? 'compact' : ''}`}
+      style={{ '--emotion-accent': theme.accent, '--emotion-strong': theme.accentStrong, '--emotion-glow': theme.glow }}
+      aria-label={`${emotion.name} expression visual`}
+      role="img"
+    >
+      <span className="visual-ring ring-one" />
+      <span className="visual-ring ring-two" />
+      <span className="face-orb">
+        <span className="face-eyes">
+          <span className="face-eye" />
+          <span className="face-eye" />
+        </span>
+        <span className="face-brow brow-left" />
+        <span className="face-brow brow-right" />
+        <span className="face-mouth" />
+      </span>
+      <span className="visual-caption">{emotion.name}</span>
+    </div>
+  );
+}
+
+function App() {
+  const [selectedEmotion, setSelectedEmotion] = useState(EMOTIONS[0]);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [result, setResult] = useState(emptyResult);
+  const [feedback, setFeedback] = useState('');
+  const [error, setError] = useState('');
+  const [step, setStep] = useState('home');
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
+
+  const probabilityRows = useMemo(() => {
+    return Object.entries(result.all_probs || {}).sort((a, b) => b[1] - a[1]);
+  }, [result]);
+
+  const activeTheme = getTheme(selectedEmotion);
+  const detectedEmotion = EMOTIONS.find((emotion) => emotion.key === emotionKeyFromLabel(result.label)) || selectedEmotion;
+
+  function handleEmotionSelect(emotion) {
+    setSelectedEmotion(emotion);
+    setError('');
+    if (step !== 'home') {
+      setStep('practice');
+    }
+  }
+
+  function handleFileChange(event) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setImageFile(file);
+    setImagePreview(previewUrl);
+    setError('');
+    event.target.value = '';
+  }
+
+  async function handleSubmit() {
+    if (!imageFile) {
+      setError('Please upload a photo before analyzing your expression.');
+      return;
+    }
+
+    setIsProcessing(true);
+    setError('');
+    setFeedback('');
+
+    try {
+      const analysis = await analyzeImage(imageFile);
+      const response = await generateFeedback(analysis, selectedEmotion.name);
+      setResult(analysis);
+      setFeedback(response.message || '');
+      setStep('result');
+    } catch (err) {
+      const message = err?.message || 'Something went wrong while analyzing the image. Please try again.';
+      if (message.toLowerCase().includes('no face')) {
+        setError('No face detected. Please try another photo with a clear view of your face.');
+      } else {
+        setError('Something went wrong while analyzing the image. Please try again.');
+      }
+      setStep('practice');
+    } finally {
+      setIsProcessing(false);
+    }
+  }
+
+  function resetPractice() {
+    setImageFile(null);
+    setImagePreview('');
+    setResult(emptyResult);
+    setFeedback('');
+    setError('');
+    setIsProcessing(false);
+    setStep('practice');
+  }
+
+  function chooseAnotherEmotion() {
+    setImageFile(null);
+    setImagePreview('');
+    setResult(emptyResult);
+    setFeedback('');
+    setError('');
+    setIsProcessing(false);
+    setStep('home');
+  }
+
+  return (
+    <div
+      className={`app-shell app-${step}`}
+      data-emotion={selectedEmotion.key}
+      style={{ '--emotion-accent': activeTheme.accent, '--emotion-strong': activeTheme.accentStrong, '--emotion-glow': activeTheme.glow }}
+    >
+      <div className="ambient ambient-one" />
+      <div className="ambient ambient-two" />
+      <header className="topbar">
+        <button type="button" className="brand-button" onClick={() => setStep('home')}>
+          <span className="brand-mark" aria-hidden="true"><span /><span /></span>
+          <span>FaceCue</span>
+        </button>
+
+        <div className="header-context">
+          <span className="context-dot" />
+          <span>{step === 'home' ? 'Expression lab' : `${selectedEmotion.name} practice`}</span>
+        </div>
+
+        {step !== 'home' && (
+          <button type="button" className="secondary-button topbar-action" onClick={chooseAnotherEmotion}>
+            Choose Another Emotion
+          </button>
+        )}
+      </header>
+
+      {step === 'home' && (
+        <main className="page home-page">
+          <section className="hero hero-grid">
+            <div className="hero-copy-block">
+              <p className="eyebrow">Facial expression practice</p>
+              <h1>Practice the <span>way you feel.</span></h1>
+              <p className="hero-copy">
+                Choose an emotion, make the expression, and let FaceCue interpret your attempt.
+              </p>
+              <div className="hero-note"><span className="note-line" /> One expression at a time</div>
+            </div>
+            <div className="hero-visual-wrap">
+              <FaceCueVisual emotion={selectedEmotion} />
+              <span className="orbit-label label-top">EXPRESS</span>
+              <span className="orbit-label label-bottom">INTERPRET</span>
+            </div>
+          </section>
+
+          <section className="emotion-panel" aria-label="Emotion choices">
+            <div className="emotion-header">
+              <p className="section-label">What do you want to practice?</p>
+            </div>
+
+            <div className="emotion-grid">
+              {EMOTIONS.map((emotion) => (
+                <button
+                  key={emotion.key}
+                  type="button"
+                  className={`emotion-card ${emotion.key} ${selectedEmotion.key === emotion.key ? 'selected' : ''}`}
+                  onClick={() => {
+                    handleEmotionSelect(emotion);
+                    setStep('practice');
+                  }}
+                  aria-pressed={selectedEmotion.key === emotion.key}
+                >
+                  <span className="emotion-check" aria-hidden="true">✓</span>
+                  <span className="emoji" aria-hidden="true">{emotion.emoji}</span>
+                  <span className="label">{emotion.name}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <div className="workflow-strip" aria-label="How it works">
+            <div className="workflow-step active">
+              <span className="workflow-index">01</span>
+              <span>Choose</span>
+            </div>
+            <span className="workflow-arrow">→</span>
+            <div className="workflow-step">
+              <span className="workflow-index">02</span>
+              <span>Practice</span>
+            </div>
+            <span className="workflow-arrow">→</span>
+            <div className="workflow-step">
+              <span className="workflow-index">03</span>
+              <span>Improve</span>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {step === 'practice' && (
+        <main className="page practice-page">
+          <section className="practice-panel">
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow subtle">Practice</p>
+                <h2>{selectedEmotion.name}</h2>
+              </div>
+              <div className="practice-badge" aria-label={`Selected emotion ${selectedEmotion.name}`}>
+                <span>{selectedEmotion.emoji}</span>
+              </div>
+            </div>
+
+            <div className="practice-intro">
+              <FaceCueVisual emotion={selectedEmotion} compact />
+              <div>
+                <span className="section-label">Your cue</span>
+                <p>Hold the feeling in your face, then capture the moment.</p>
+              </div>
+            </div>
+
+            <p className="panel-subtitle">Show your expression and submit it for analysis.</p>
+
+            <div className="upload-box">
+              {imagePreview ? (
+                <div className="image-preview-wrap">
+                  <img src={imagePreview} alt="Selected expression preview" className="image-preview" />
+                  <div className="image-actions">
+                    <button type="button" className="secondary-button" onClick={() => fileInputRef.current?.click()}>
+                      Replace Image
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost-button"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview('');
+                        setError('');
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="upload-dropzone" htmlFor="photo-upload">
+                  <input
+                    id="photo-upload"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    aria-label="Upload an image to analyze"
+                  />
+                  <span className="upload-icon" aria-hidden="true"><span /><span /><span /></span>
+                  <span className="upload-title">Show your expression</span>
+                  <span className="upload-caption">Upload a clear face photo to begin.</span>
+                  <span className="upload-action">Choose image</span>
+                </label>
+              )}
+            </div>
+
+            {isProcessing && (
+              <div className="loading-state" aria-live="polite">
+                <div className="loading-face" aria-hidden="true"><span /><span /><i /></div>
+                <div>
+                  <strong>Analyzing expression</strong>
+                  <p>FaceCue is interpreting your expression.</p>
+                </div>
+              </div>
+            )}
+
+            {error && <p className="status-message error">{error}</p>}
+
+            <button
+              type="button"
+              className="primary-button"
+              disabled={!imageFile || isProcessing}
+              onClick={handleSubmit}
+            >
+              {isProcessing ? 'Analyzing your expression...' : 'Analyze Expression'}
+            </button>
+          </section>
+        </main>
+      )}
+
+      {step === 'result' && (
+        <main className="page result-page">
+          <section className="result-panel">
+            <div className="panel-header result-header">
+              <div>
+                <p className="eyebrow subtle">Your result</p>
+                <h2>Detected emotion</h2>
+              </div>
+            </div>
+
+            <div className="result-shell" style={{ '--result-accent': getTheme(detectedEmotion).accent, '--result-glow': getTheme(detectedEmotion).glow }}>
+                <div className="result-card">
+                  <div className="result-summary">
+                    <FaceCueVisual emotion={detectedEmotion} compact />
+                    <div>
+                      <p className="label-small">FaceCue interpreted your expression as</p>
+                      <h3>{result.label || 'Unknown'}</h3>
+                    </div>
+                  </div>
+
+                  <div className="meta-grid">
+                    <div>
+                      <span className="label-small">Target emotion</span>
+                      <strong>{selectedEmotion.name}</strong>
+                    </div>
+                    <div>
+                      <span className="label-small">Confidence</span>
+                      <strong>{result.confidence ? `${(result.confidence * 100).toFixed(1)}%` : '—'}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="breakdown-box">
+                  <h3>Model result</h3>
+                  <ul className="probability-list">
+                    {probabilityRows.map(([emotion, probability]) => (
+                      <li key={emotion}>
+                        <span>{emotion}</span>
+                        <div className="probability-bar-track" aria-hidden="true">
+                          <span className="probability-bar" style={{ width: `${Math.max(probability * 100, 4)}%` }} />
+                        </div>
+                        <strong>{(probability * 100).toFixed(1)}%</strong>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+            </div>
+
+            <div className="feedback-box" style={{ '--feedback-accent': getTheme(detectedEmotion).accent }}>
+              <div className="feedback-heading"><span className="feedback-icon">✦</span><h3>Coaching note</h3></div>
+              <div className="feedback-content">
+                {feedback ? (
+                  <p>{feedback}</p>
+                ) : (
+                  <p>No coaching feedback was returned for this attempt.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="action-row">
+              <button type="button" className="primary-button" onClick={resetPractice}>
+                Try Again
+              </button>
+              <button type="button" className="secondary-button" onClick={chooseAnotherEmotion}>
+                Choose Another Emotion
+              </button>
+            </div>
+          </section>
+        </main>
+      )}
+
+      <footer className="footer">
+        <span>FaceCue</span>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
