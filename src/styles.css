@@ -1114,7 +1114,7 @@ img { display: block; max-width: 100%; }
   .footer-inner { flex-direction: column; }
   .footer-face-wrap { margin: 0 auto; }
   .footer-links { gap: 18px; }
-  .background-particle:nth-child(n + 61) { display: none; }
+  .background-particle:nth-child(n + 76) { display: none; }
   .emoji-burst { inset: 10px; }
   .burst-emoji { font-size: 1.25rem; }
 }

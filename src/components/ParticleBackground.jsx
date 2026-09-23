@@ -1,5 +1,5 @@
-const PARTICLE_TYPES = ['star', 'star', 'triangle', 'square'];
-const PARTICLE_COUNT = 120;
+const PARTICLE_TYPES = ['star', 'star', 'star', 'triangle', 'triangle', 'square', 'square'];
+const PARTICLE_COUNT = 154;
 
 function randomBetween(min, max) {
   return min + Math.random() * (max - min);
