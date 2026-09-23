@@ -386,8 +386,31 @@ img { display: block; max-width: 100%; }
   border-color: color-mix(in srgb, var(--emotion-accent) 30%, transparent);
   animation: orbit 20s linear infinite;
 }
+.emoji-burst {
+  position: absolute;
+  inset: 16px;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.burst-emoji {
+  position: absolute;
+  top: var(--burst-top);
+  left: var(--burst-left);
+  display: block;
+  color: var(--ink);
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: var(--burst-size);
+  line-height: 1;
+  opacity: 0;
+  filter: drop-shadow(0 0 10px var(--emotion-glow));
+  animation: emoji-burst-fall var(--burst-duration) var(--burst-delay) ease-in-out infinite;
+  will-change: transform, opacity;
+}
 .face-core {
   position: relative;
+  z-index: 2;
   display: block;
   width: 180px;
   height: 180px;
@@ -1023,6 +1046,13 @@ img { display: block; max-width: 100%; }
   0%, 100% { filter: brightness(0.88); }
   50% { filter: brightness(1.18); }
 }
+@keyframes emoji-burst-fall {
+  0% { opacity: 0; transform: translate3d(0, -12px, 0) rotate(0deg) scale(0.5); }
+  8% { opacity: var(--burst-opacity); transform: translate3d(0, 0, 0) rotate(0deg) scale(1.06); }
+  18% { opacity: var(--burst-opacity); transform: translate3d(6px, 14px, 0) rotate(calc(var(--burst-rotation) * 0.25)) scale(1); }
+  72% { opacity: var(--burst-opacity); }
+  100% { opacity: 0; transform: translate3d(var(--burst-drift), var(--burst-fall), 0) rotate(var(--burst-rotation)) scale(var(--burst-scale)); }
+}
 
 @media (max-width: 900px) {
   .hero {
@@ -1085,6 +1115,8 @@ img { display: block; max-width: 100%; }
   .footer-face-wrap { margin: 0 auto; }
   .footer-links { gap: 18px; }
   .background-particle:nth-child(n + 61) { display: none; }
+  .emoji-burst { inset: 10px; }
+  .burst-emoji { font-size: 1.25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1094,4 +1126,9 @@ img { display: block; max-width: 100%; }
     scroll-behavior: auto !important;
   }
   .particle-background { display: none; }
+  .burst-emoji {
+    animation: none;
+    opacity: var(--burst-opacity);
+    transform: scale(var(--burst-scale));
+  }
 }

@@ -28,6 +28,17 @@ function emotionKeyFromLabel(label) {
   return match?.key || 'neutral';
 }
 
+const EMOJI_BURST_PARTICLES = [
+  { left: '8%', top: '12%', size: '1.45rem', opacity: 0.42, delay: '-1.8s', duration: '8.8s', drift: '48px', fall: '108px', rotation: '-18deg', scale: 0.84 },
+  { left: '31%', top: '4%', size: '1.7rem', opacity: 0.52, delay: '-5.1s', duration: '10.4s', drift: '34px', fall: '124px', rotation: '14deg', scale: 0.92 },
+  { left: '68%', top: '9%', size: '1.35rem', opacity: 0.38, delay: '-3.4s', duration: '9.6s', drift: '-42px', fall: '116px', rotation: '22deg', scale: 0.78 },
+  { left: '86%', top: '24%', size: '1.8rem', opacity: 0.48, delay: '-7.2s', duration: '11.2s', drift: '-30px', fall: '102px', rotation: '-12deg', scale: 0.88 },
+  { left: '3%', top: '47%', size: '1.6rem', opacity: 0.46, delay: '-4.6s', duration: '9.2s', drift: '38px', fall: '92px', rotation: '18deg', scale: 0.86 },
+  { left: '89%', top: '51%', size: '1.4rem', opacity: 0.36, delay: '-2.7s', duration: '10.8s', drift: '-52px', fall: '96px', rotation: '-20deg', scale: 0.8 },
+  { left: '17%', top: '75%', size: '1.3rem', opacity: 0.34, delay: '-8.4s', duration: '12.4s', drift: '28px', fall: '76px', rotation: '12deg', scale: 0.76 },
+  { left: '74%', top: '72%', size: '1.55rem', opacity: 0.4, delay: '-6.3s', duration: '11.8s', drift: '-36px', fall: '82px', rotation: '-16deg', scale: 0.84 },
+];
+
 function FaceCueVisual({ emotion, compact = false }) {
   const theme = getTheme(emotion);
 
@@ -41,6 +52,30 @@ function FaceCueVisual({ emotion, compact = false }) {
       <span className="visual-ring ring-one" />
       <span className="visual-ring ring-two" />
       <span className="visual-ring ring-three" />
+      {!compact && (
+        <span className="emoji-burst" aria-hidden="true">
+          {EMOJI_BURST_PARTICLES.map((particle, index) => (
+            <span
+              key={index}
+              className="burst-emoji"
+              style={{
+                '--burst-left': particle.left,
+                '--burst-top': particle.top,
+                '--burst-size': particle.size,
+                '--burst-opacity': particle.opacity,
+                '--burst-delay': particle.delay,
+                '--burst-duration': particle.duration,
+                '--burst-drift': particle.drift,
+                '--burst-fall': particle.fall,
+                '--burst-rotation': particle.rotation,
+                '--burst-scale': particle.scale,
+              }}
+            >
+              {emotion.emoji}
+            </span>
+          ))}
+        </span>
+      )}
       <span className="face-core">
         <span className="face-emoji" aria-hidden="true">{emotion.emoji}</span>
         <span className="face-particle particle-one" />
