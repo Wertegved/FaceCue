@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { EMOTIONS } from './data/emotions';
 import { analyzeImage, generateFeedback } from './services/api';
+import ParticleBackground from './components/ParticleBackground';
 
 const emptyResult = {
   label: '',
@@ -194,6 +195,7 @@ function App() {
       data-emotion={selectedEmotion.key}
       style={{ '--emotion-accent': activeTheme.accent, '--emotion-strong': activeTheme.accentStrong, '--emotion-glow': activeTheme.glow }}
     >
+      <ParticleBackground />
       <div className="ambient ambient-one" />
       <div className="ambient ambient-two" />
 

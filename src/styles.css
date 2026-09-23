@@ -45,6 +45,40 @@ img { display: block; max-width: 100%; }
     linear-gradient(135deg, var(--night) 0%, #0d101d 36%, #111827 100%);
   transition: background 420ms var(--ease);
 }
+.particle-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.background-particle {
+  position: absolute;
+  top: var(--particle-start-y);
+  left: var(--particle-x);
+  display: block;
+  width: var(--particle-size);
+  height: var(--particle-size);
+  background: rgba(255, 255, 255, var(--particle-opacity));
+  animation: particle-fall var(--particle-duration) linear var(--particle-delay) infinite;
+  will-change: transform, opacity;
+}
+.particle-star {
+  clip-path: polygon(50% 0%, 62% 36%, 100% 50%, 62% 64%, 50% 100%, 38% 64%, 0% 50%, 38% 36%);
+}
+.particle-triangle {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+.particle-square {
+  border-radius: 1px;
+}
+.particle-twinkle {
+  animation-name: particle-fall, particle-twinkle;
+  animation-duration: var(--particle-duration), 3.8s;
+  animation-delay: var(--particle-delay), -1.4s;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+}
 .app-shell::before {
   position: absolute;
   inset: 0;
@@ -927,6 +961,8 @@ img { display: block; max-width: 100%; }
   margin-top: 0;
 }
 .site-footer {
+  position: relative;
+  z-index: 1;
   padding: 26px 0 10px;
 }
 .footer-inner {
@@ -978,6 +1014,15 @@ img { display: block; max-width: 100%; }
 @keyframes drift { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(20px, -20px, 0) scale(1.12); } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modal-rise { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes particle-fall {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg); }
+  8%, 92% { opacity: var(--particle-opacity); }
+  100% { opacity: 0; transform: translate3d(var(--particle-drift), calc(220vh + 120px), 0) rotate(var(--particle-rotation)); }
+}
+@keyframes particle-twinkle {
+  0%, 100% { filter: brightness(0.88); }
+  50% { filter: brightness(1.18); }
+}
 
 @media (max-width: 900px) {
   .hero {
@@ -986,6 +1031,7 @@ img { display: block; max-width: 100%; }
   }
   .emotion-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .hero-visual-wrap { min-height: 320px; }
+  .background-particle:nth-child(n + 91) { display: none; }
 }
 
 @media (max-width: 640px) {
@@ -1038,6 +1084,7 @@ img { display: block; max-width: 100%; }
   .footer-inner { flex-direction: column; }
   .footer-face-wrap { margin: 0 auto; }
   .footer-links { gap: 18px; }
+  .background-particle:nth-child(n + 61) { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1046,4 +1093,5 @@ img { display: block; max-width: 100%; }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .particle-background { display: none; }
 }
