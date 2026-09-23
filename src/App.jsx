@@ -98,7 +98,19 @@ function App() {
   const [step, setStep] = useState('home');
   const [dragActive, setDragActive] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [pointerOffset, setPointerOffset] = useState({ x: 0, y: 0 });
+  const [reducedMotion, setReducedMotion] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateMotionPreference = () => setReducedMotion(mediaQuery.matches);
+
+    updateMotionPreference();
+    mediaQuery.addEventListener?.('change', updateMotionPreference);
+
+    return () => mediaQuery.removeEventListener?.('change', updateMotionPreference);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -118,6 +130,34 @@ function App() {
       }
     };
   }, [imagePreview, previewOpen]);
+
+  useEffect(() => {
+    if (reducedMotion || step !== 'home') {
+      setPointerOffset({ x: 0, y: 0 });
+      return;
+    }
+
+    const handlePointerMove = (event) => {
+      const heroNode = document.querySelector('.hero-visual-wrap');
+      if (!heroNode) return;
+
+      const rect = heroNode.getBoundingClientRect();
+      const offsetX = ((event.clientX - (rect.left + rect.width / 2)) / rect.width) * 10;
+      const offsetY = ((event.clientY - (rect.top + rect.height / 2)) / rect.height) * 10;
+      setPointerOffset({ x: Math.max(-8, Math.min(8, offsetX)), y: Math.max(-8, Math.min(8, offsetY)) });
+    };
+
+    const handlePointerLeave = () => setPointerOffset({ x: 0, y: 0 });
+
+    const heroNode = document.querySelector('.hero-visual-wrap');
+    heroNode?.addEventListener('pointermove', handlePointerMove);
+    heroNode?.addEventListener('pointerleave', handlePointerLeave);
+
+    return () => {
+      heroNode?.removeEventListener('pointermove', handlePointerMove);
+      heroNode?.removeEventListener('pointerleave', handlePointerLeave);
+    };
+  }, [reducedMotion, step]);
 
   const probabilityRows = useMemo(() => {
     return Object.entries(result.all_probs || {}).sort((a, b) => b[1] - a[1]);
@@ -274,7 +314,13 @@ function App() {
               </div>
             </div>
 
-            <div className="hero-visual-wrap">
+            <div
+              className="hero-visual-wrap"
+              style={{ '--pointer-x': `${pointerOffset.x}px`, '--pointer-y': `${pointerOffset.y}px` }}
+            >
+              <div className="micro-label label-one">Expression</div>
+              <div className="micro-label label-two">Practice</div>
+              <div className="micro-label label-three">Feedback</div>
               <div className="visual-shell">
                 <FaceCueVisual emotion={selectedEmotion} />
               </div>
