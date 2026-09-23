@@ -41,11 +41,7 @@ function FaceCueVisual({ emotion, compact = false }) {
       <span className="visual-ring ring-two" />
       <span className="visual-ring ring-three" />
       <span className="face-core">
-        <span className="face-eye left" />
-        <span className="face-eye right" />
-        <span className="face-brow brow-left" />
-        <span className="face-brow brow-right" />
-        <span className="face-mouth" />
+        <span className="face-emoji" aria-hidden="true">{emotion.emoji}</span>
         <span className="face-particle particle-one" />
         <span className="face-particle particle-two" />
         <span className="face-particle particle-three" />
@@ -430,11 +426,7 @@ function App() {
 
             {isProcessing && (
               <div className="loading-state" aria-live="polite">
-                <div className="loading-face" aria-hidden="true">
-                  <span />
-                  <span />
-                  <i />
-                </div>
+                <FaceCueVisual emotion={selectedEmotion} compact />
                 <div>
                   <strong>FaceCue is reading your expression...</strong>
                   <p>Scanning the face and comparing it to your target emotion.</p>

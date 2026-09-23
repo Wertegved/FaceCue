@@ -368,53 +368,18 @@ img { display: block; max-width: 100%; }
   width: 82px;
   height: 82px;
 }
-.face-eye {
-  position: absolute;
-  top: 49%;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--emotion-accent);
-  box-shadow: 0 0 10px var(--emotion-glow);
+.face-emoji {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 8rem;
+  line-height: 1.2;
+  filter: drop-shadow(0 0 18px var(--emotion-glow));
+  animation: breathe 4.8s ease-in-out infinite;
 }
-.face-visual.compact .face-eye {
-  width: 8px;
-  height: 8px;
-}
-.face-eye.left { left: 38%; }
-.face-eye.right { right: 38%; }
-.face-brow {
-  position: absolute;
-  top: 34%;
-  width: 30px;
-  height: 6px;
-  border-radius: 999px;
-  border-top: 2px solid var(--emotion-accent);
-}
-.face-visual.compact .face-brow {
-  top: 31%;
-  width: 16px;
-  height: 4px;
-  border-top-width: 1px;
-}
-.brow-left { left: 28%; transform: rotate(-8deg); }
-.brow-right { right: 28%; transform: rotate(8deg); }
-.face-mouth {
-  position: absolute;
-  left: 50%;
-  bottom: 28%;
-  width: 46px;
-  height: 18px;
-  border-bottom: 3px solid var(--emotion-accent);
-  border-radius: 0 0 50% 50%;
-  transform: translateX(-50%);
-  transition: all 260ms var(--ease);
-}
-.face-visual.compact .face-mouth {
-  width: 24px;
-  height: 10px;
-  border-bottom-width: 2px;
-  bottom: 24%;
+.face-visual.compact .face-emoji {
+  font-size: 3.5rem;
 }
 .face-particle {
   position: absolute;
@@ -435,175 +400,6 @@ img { display: block; max-width: 100%; }
   font-size: 0.64rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-.face-visual.happy .face-eye {
-  width: 18px;
-  height: 12px;
-  border-radius: 50% 50% 44% 44%;
-  background: color-mix(in srgb, var(--emotion-accent) 85%, white 15%);
-  transform: scale(1.08);
-}
-.face-visual.happy .face-brow {
-  border-top-width: 2px;
-  opacity: 0.85;
-}
-.face-visual.happy .face-mouth {
-  height: 26px;
-  width: 50px;
-  border-bottom: 4px solid var(--emotion-accent);
-  border-radius: 0 0 60px 60px;
-}
-
-.face-visual.sad .face-eye {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  box-shadow: inset 0 0 0 3px var(--emotion-accent);
-  transform: scale(0.96);
-}
-.face-visual.sad .face-brow {
-  top: 33%;
-  width: 28px;
-  height: 6px;
-  border-top: 3px solid var(--emotion-accent);
-}
-.face-visual.sad .brow-left {
-  left: 27%;
-  transform: rotate(16deg);
-}
-.face-visual.sad .brow-right {
-  right: 27%;
-  transform: rotate(-16deg);
-}
-.face-visual.sad .face-mouth {
-  width: 42px;
-  height: 26px;
-  border-bottom: 0;
-  border-top: 4px solid var(--emotion-accent);
-  border-radius: 50% 50% 0 0;
-  transform: translateX(-50%) rotate(180deg);
-}
-
-.face-visual.angry .face-eye {
-  width: 18px;
-  height: 12px;
-  border-radius: 50% 50% 30% 30%;
-  transform: scale(0.9);
-}
-.face-visual.angry .brow-left {
-  left: 27%;
-  transform: rotate(20deg);
-}
-.face-visual.angry .brow-right {
-  right: 27%;
-  transform: rotate(-20deg);
-}
-.face-visual.angry .face-mouth {
-  width: 46px;
-  height: 16px;
-  border-bottom: 0;
-  border-top: 4px solid var(--emotion-accent);
-  border-radius: 55% 55% 0 0;
-  bottom: 31%;
-}
-
-.face-visual.fear .face-eye {
-  width: 20px;
-  height: 20px;
-  border-radius: 55%;
-  background: color-mix(in srgb, var(--emotion-accent) 85%, white 15%);
-  transform: scale(1.25);
-}
-.face-visual.fear .face-brow {
-  top: 31%;
-  width: 34px;
-  height: 7px;
-  border-top: 3px solid var(--emotion-accent);
-}
-.face-visual.fear .brow-left {
-  left: 24%;
-  transform: rotate(18deg);
-}
-.face-visual.fear .brow-right {
-  right: 24%;
-  transform: rotate(-18deg);
-}
-.face-visual.fear .face-mouth {
-  width: 50px;
-  height: 18px;
-  border-bottom: 3px solid var(--emotion-accent);
-  border-radius: 62% 62% 50% 50%;
-  bottom: 30%;
-}
-
-.face-visual.surprise .face-eye {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  transform: scale(1.45);
-}
-.face-visual.surprise .face-brow {
-  top: 28%;
-  width: 34px;
-  height: 8px;
-  border-top: 4px solid var(--emotion-accent);
-}
-.face-visual.surprise .brow-left {
-  left: 24%;
-  transform: rotate(12deg);
-}
-.face-visual.surprise .brow-right {
-  right: 24%;
-  transform: rotate(-12deg);
-}
-.face-visual.surprise .face-mouth {
-  width: 52px;
-  height: 34px;
-  border: 4px solid var(--emotion-accent);
-  border-top: 0;
-  border-radius: 0 0 55% 55%;
-  bottom: 22%;
-}
-
-.face-visual.neutral .face-eye {
-  transform: scale(1.02);
-}
-.face-visual.neutral .face-brow {
-  top: 34%;
-  width: 30px;
-  height: 4px;
-  border-top-width: 2px;
-}
-.face-visual.neutral .face-mouth {
-  width: 44px;
-  height: 8px;
-  border-radius: 0;
-  border-bottom: 3px solid var(--emotion-accent);
-}
-
-.face-visual.disgust .face-eye {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  transform: scale(0.92);
-}
-.face-visual.disgust .brow-left {
-  left: 25%;
-  transform: rotate(18deg);
-}
-.face-visual.disgust .brow-right {
-  right: 25%;
-  transform: rotate(-26deg);
-}
-.face-visual.disgust .face-mouth {
-  width: 52px;
-  height: 18px;
-  border-bottom: 0;
-  border-top: 4px solid var(--emotion-accent);
-  border-radius: 50% 50% 0 0;
-  transform: translateX(-50%) rotate(-12deg);
-  bottom: 30%;
 }
 .emotion-panel {
   padding: 22px;
@@ -783,6 +579,17 @@ img { display: block; max-width: 100%; }
   border: 1px solid var(--line);
   border-radius: 20px;
   background: radial-gradient(circle at center, var(--emotion-glow), rgba(255,255,255,0.02));
+}
+.preview-modal-visual .face-visual {
+  width: 210px;
+  height: 210px;
+}
+.preview-modal-visual .face-core {
+  width: 132px;
+  height: 132px;
+}
+.preview-modal-visual .face-emoji {
+  font-size: 5.25rem;
 }
 .preview-copy-block h4 {
   margin: 0 0 10px;
@@ -983,39 +790,17 @@ img { display: block; max-width: 100%; }
   background: rgba(255,255,255,0.02);
   animation: reveal 360ms var(--ease) both;
 }
-.loading-face {
-  position: relative;
+.loading-state .face-visual {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+}
+.loading-state .face-core {
   width: 42px;
   height: 42px;
-  border: 1px solid var(--emotion-accent);
-  border-radius: 50%;
-  box-shadow: 0 0 18px var(--emotion-glow);
 }
-.loading-face::before,
-.loading-face::after,
-.loading-face span,
-.loading-face i {
-  position: absolute;
-  display: block;
-  content: "";
-  background: var(--emotion-accent);
-}
-.loading-face::before,
-.loading-face::after {
-  top: 14px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-}
-.loading-face::before { left: 10px; }
-.loading-face::after { right: 10px; }
-.loading-face span { bottom: 10px; left: 13px; width: 16px; height: 2px; }
-.loading-face i {
-  left: -4px;
-  right: -4px;
-  height: 2px;
-  opacity: 0.9;
-  animation: scan 1.6s ease-in-out infinite;
+.loading-state .face-emoji {
+  font-size: 1.8rem;
 }
 .loading-state strong { display: block; }
 .loading-state p { margin: 4px 0 0; color: var(--muted); font-size: 0.82rem; }
