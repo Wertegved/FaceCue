@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { EMOTIONS } from './data/emotions';
 import { analyzeImage, generateFeedback } from './services/api';
 import ParticleBackground from './components/ParticleBackground';
+import FaceCueLogo from './components/FaceCueLogo';
 
 const emptyResult = {
   label: '',
@@ -276,10 +277,7 @@ function App() {
 
       <header className="topbar">
         <button type="button" className="brand-button" onClick={() => setStep('home')}>
-          <span className="brand-mark" aria-hidden="true">
-            <span />
-            <span />
-          </span>
+          <FaceCueLogo />
           <span>FaceCue</span>
         </button>
 
@@ -414,6 +412,7 @@ function App() {
             <div className="preview-modal-content">
               <div className="preview-modal-visual">
                 <FaceCueVisual emotion={selectedEmotion} />
+                <span className="preview-emotion-name">{selectedEmotion.name}</span>
               </div>
 
               <div className="preview-copy-block">
@@ -509,8 +508,10 @@ function App() {
 
             {isProcessing && (
               <div className="loading-state" aria-live="polite">
-                <FaceCueVisual emotion={selectedEmotion} compact />
-                <div>
+                <div className="analysis-visual">
+                  <FaceCueVisual emotion={selectedEmotion} compact />
+                </div>
+                <div className="analysis-copy">
                   <strong>FaceCue is reading your expression...</strong>
                   <p>Scanning the face and comparing it to your target emotion.</p>
                 </div>
@@ -608,10 +609,7 @@ function App() {
         <div className="footer-inner">
           <div className="footer-brand-block">
             <div className="brand-button footer-brand" aria-label="FaceCue home">
-              <span className="brand-mark" aria-hidden="true">
-                <span />
-                <span />
-              </span>
+              <FaceCueLogo />
               <span>FaceCue</span>
             </div>
             <p>Practice facial expressions, explore emotional cues, and learn from AI-generated feedback.</p>
