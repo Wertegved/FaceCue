@@ -186,7 +186,10 @@ function App() {
 
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
+    setResult(emptyResult);
+    setFeedback('');
     setError('');
+    setIsProcessing(false);
   }
 
   function handleFileChange(event) {
@@ -410,8 +413,10 @@ function App() {
             </div>
 
             <div className="preview-modal-content">
-              <div className="preview-modal-visual">
-                <FaceCueVisual emotion={selectedEmotion} />
+              <div className="preview-modal-visual preview-emotion-visual">
+                <div className="preview-emotion-face">
+                  <FaceCueVisual emotion={selectedEmotion} />
+                </div>
                 <span className="preview-emotion-name">{selectedEmotion.name}</span>
               </div>
 
@@ -457,6 +462,15 @@ function App() {
             <p className="panel-subtitle">Show your expression and submit it for analysis.</p>
 
             <div className="upload-box">
+              <input
+                id="photo-upload"
+                ref={fileInputRef}
+                className="upload-file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                aria-label="Upload an image to analyze"
+              />
               {imagePreview ? (
                 <div className="image-preview-wrap">
                   <img src={imagePreview} alt="Selected expression preview" className="image-preview" />
@@ -486,14 +500,6 @@ function App() {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
-                  <input
-                    id="photo-upload"
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    aria-label="Upload an image to analyze"
-                  />
                   <span className="upload-icon" aria-hidden="true">
                     <span />
                     <span />

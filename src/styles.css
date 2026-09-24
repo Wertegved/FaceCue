@@ -735,10 +735,18 @@ img { display: block; max-width: 100%; }
 .preview-modal-visual .face-emoji {
   font-size: 5.25rem;
 }
+.preview-emotion-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
 .preview-modal-visual .visual-caption { display: none; }
 .preview-emotion-name {
   position: relative;
   z-index: 3;
+  display: block;
+  width: 100%;
   margin-top: -2px;
   color: var(--muted-strong);
   font-size: 0.72rem;
@@ -850,6 +858,7 @@ img { display: block; max-width: 100%; }
   color: var(--muted);
 }
 .upload-box { margin-top: 18px; }
+.upload-file-input { display: none; }
 .upload-dropzone {
   position: relative;
   display: flex;
