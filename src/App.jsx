@@ -3,6 +3,7 @@ import { EMOTIONS } from './data/emotions';
 import { analyzeImage, generateFeedback } from './services/api';
 import ParticleBackground from './components/ParticleBackground';
 import FaceCueLogo from './components/FaceCueLogo';
+import CameraCapture from './components/CameraCapture';
 
 const emptyResult = {
   label: '',
@@ -98,6 +99,7 @@ function App() {
   const [error, setError] = useState('');
   const [step, setStep] = useState('home');
   const [dragActive, setDragActive] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [pointerOffset, setPointerOffset] = useState({ x: 0, y: 0 });
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -160,6 +162,12 @@ function App() {
     };
   }, [reducedMotion, step]);
 
+  useEffect(() => {
+    if (step !== 'practice') {
+      setIsCameraOpen(false);
+    }
+  }, [step]);
+
   const probabilityRows = useMemo(() => {
     return Object.entries(result.all_probs || {}).sort((a, b) => b[1] - a[1]);
   }, [result]);
@@ -217,6 +225,21 @@ function App() {
     setDragActive(false);
     const file = event.dataTransfer.files?.[0];
     assignImage(file);
+  }
+
+  function openCamera() {
+    setError('');
+    setIsCameraOpen(true);
+  }
+
+  function handleCameraCapture(file) {
+    assignImage(file);
+    setIsCameraOpen(false);
+  }
+
+  function handleCameraError(message) {
+    setError(message);
+    setIsCameraOpen(false);
   }
 
   async function handleSubmit() {
@@ -471,12 +494,17 @@ function App() {
                 onChange={handleFileChange}
                 aria-label="Upload an image to analyze"
               />
-              {imagePreview ? (
+              {isCameraOpen ? (
+                <CameraCapture onCapture={handleCameraCapture} onCancel={() => setIsCameraOpen(false)} onError={handleCameraError} />
+              ) : imagePreview ? (
                 <div className="image-preview-wrap">
                   <img src={imagePreview} alt="Selected expression preview" className="image-preview" />
                   <div className="image-actions">
                     <button type="button" className="secondary-button" onClick={() => fileInputRef.current?.click()}>
                       Replace Image
+                    </button>
+                    <button type="button" className="secondary-button" onClick={openCamera}>
+                      Use Camera
                     </button>
                     <button
                       type="button"
@@ -492,9 +520,8 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <label
-                  className={`upload-dropzone ${dragActive ? 'drag-active' : ''}`}
-                  htmlFor="photo-upload"
+                <div
+                  className={`upload-dropzone image-source-dropzone ${dragActive ? 'drag-active' : ''}`}
                   onDragOver={handleDragOver}
                   onDragEnter={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -505,10 +532,19 @@ function App() {
                     <span />
                     <span />
                   </span>
-                  <span className="upload-title">Drop your expression here</span>
-                  <span className="upload-caption">or choose an image from your device.</span>
-                  <span className="upload-action">Choose image</span>
-                </label>
+                  <span className="upload-title">Add your expression</span>
+                  <span className="upload-caption">Choose a saved photo from your device or take a new one with your camera.</span>
+                  <div className="source-choice-group">
+                    <button type="button" className="secondary-button source-choice-button" onClick={() => fileInputRef.current?.click()}>
+                      Choose Image
+                    </button>
+                    <span className="source-choice-or">or</span>
+                    <button type="button" className="secondary-button source-choice-button" onClick={openCamera}>
+                      Use Camera
+                    </button>
+                  </div>
+                  <span className="source-drop-hint">You can also drop an image here.</span>
+                </div>
               )}
             </div>
 
