@@ -4,6 +4,7 @@ import { analyzeImage, generateFeedback } from './services/api';
 import ParticleBackground from './components/ParticleBackground';
 import FaceCueLogo from './components/FaceCueLogo';
 import CameraCapture from './components/CameraCapture';
+import { getSessionProgress, saveEmotionProbabilities } from './utils/sessionProgress';
 
 const emptyResult = {
   label: '',
@@ -28,6 +29,22 @@ function getTheme(emotion) {
 function emotionKeyFromLabel(label) {
   const match = EMOTIONS.find((emotion) => emotion.name.toLowerCase() === label?.toLowerCase());
   return match?.key || 'neutral';
+}
+
+function getEmotionProbability(allProbs, emotion) {
+  const entry = Object.entries(allProbs || {}).find(([label]) => {
+    const normalizedLabel = label.toLowerCase();
+    return normalizedLabel === emotion.key || normalizedLabel === emotion.name.toLowerCase();
+  });
+  const probability = Number(entry?.[1]);
+  return Number.isFinite(probability) ? probability * 100 : null;
+}
+
+function getEmotionScores(allProbs) {
+  return EMOTIONS.reduce((emotionScores, emotion) => {
+    emotionScores[emotion.key] = getEmotionProbability(allProbs, emotion);
+    return emotionScores;
+  }, {});
 }
 
 const EMOJI_BURST_PARTICLES = [
@@ -89,6 +106,63 @@ function FaceCueVisual({ emotion, compact = false }) {
   );
 }
 
+function EmotionProgress({ sessionProgress, probabilitySnapshot, selectedEmotion }) {
+  return (
+    <section className="session-progress" aria-labelledby="session-progress-title">
+      <div className="session-progress-header">
+        <h3 id="session-progress-title">Session progress</h3>
+        <span>All emotions</span>
+      </div>
+      <ul className="session-progress-list">
+        {EMOTIONS.map((emotion) => {
+          const storedEmotion = sessionProgress[emotion.key];
+          const storedAttempts = Array.isArray(storedEmotion?.attempts) ? storedEmotion.attempts : [];
+          const storedScore = Number(storedEmotion?.current ?? storedAttempts[storedAttempts.length - 1] ?? 0);
+          const score = Number.isFinite(storedScore) ? storedScore : 0;
+          const previousScore = probabilitySnapshot?.previous?.[emotion.key];
+          const hasPreviousScore = Number.isFinite(previousScore);
+          const delta = hasPreviousScore ? score - previousScore : null;
+          const theme = getTheme(emotion);
+
+          return (
+            <li
+              key={emotion.key}
+              className={selectedEmotion.key === emotion.key ? 'session-progress-row selected' : 'session-progress-row'}
+              style={{ '--progress-accent': theme.accent, '--progress-glow': theme.glow }}
+            >
+              <div className="session-progress-label">
+                <span aria-hidden="true">{emotion.emoji}</span>
+                <span>{emotion.name}</span>
+              </div>
+              <div
+                className="session-progress-track"
+                role="progressbar"
+                aria-label={`${emotion.name} emotion score: ${score.toFixed(1)} percent`}
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow={score}
+              >
+                <span
+                  className="session-progress-fill"
+                  style={{ width: `${score}%`, '--progress-start': hasPreviousScore ? previousScore / 100 : 0 }}
+                />
+              </div>
+              <div className="session-progress-value">
+                <strong>{score.toFixed(1)}%</strong>
+                {hasPreviousScore && (
+                  <small className={delta < 0 ? 'negative-delta' : ''}>
+                    {delta > 0 ? '+' : delta < 0 ? '-' : ''}{Math.abs(delta).toFixed(1)} pts
+                  </small>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 function App() {
   const [selectedEmotion, setSelectedEmotion] = useState(EMOTIONS[0]);
   const [imageFile, setImageFile] = useState(null);
@@ -101,6 +175,8 @@ function App() {
   const [dragActive, setDragActive] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [probabilitySnapshot, setProbabilitySnapshot] = useState(null);
+  const [sessionProgress, setSessionProgress] = useState(() => getSessionProgress());
   const [pointerOffset, setPointerOffset] = useState({ x: 0, y: 0 });
   const [reducedMotion, setReducedMotion] = useState(false);
   const fileInputRef = useRef(null);
@@ -169,7 +245,11 @@ function App() {
   }, [step]);
 
   const probabilityRows = useMemo(() => {
-    return Object.entries(result.all_probs || {}).sort((a, b) => b[1] - a[1]);
+    const scores = getEmotionScores(result.all_probs);
+    return EMOTIONS
+      .map((emotion) => ({ emotion, score: scores[emotion.key] }))
+      .filter(({ score }) => score !== null)
+      .sort((a, b) => b.score - a.score);
   }, [result]);
 
   const activeTheme = getTheme(selectedEmotion);
@@ -195,6 +275,7 @@ function App() {
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
     setResult(emptyResult);
+    setProbabilitySnapshot(null);
     setFeedback('');
     setError('');
     setIsProcessing(false);
@@ -255,7 +336,11 @@ function App() {
     try {
       const analysis = await analyzeImage(imageFile);
       const response = await generateFeedback(analysis, selectedEmotion.name);
+      const scores = getEmotionScores(analysis.all_probs);
+      const snapshot = saveEmotionProbabilities(scores);
       setResult(analysis);
+      setProbabilitySnapshot(snapshot);
+      setSessionProgress(getSessionProgress());
       setFeedback(response.message || '');
       setStep('result');
     } catch (err) {
@@ -275,6 +360,7 @@ function App() {
     setImageFile(null);
     setImagePreview('');
     setResult(emptyResult);
+    setProbabilitySnapshot(null);
     setFeedback('');
     setError('');
     setIsProcessing(false);
@@ -285,6 +371,7 @@ function App() {
     setImageFile(null);
     setImagePreview('');
     setResult(emptyResult);
+    setProbabilitySnapshot(null);
     setFeedback('');
     setError('');
     setIsProcessing(false);
@@ -570,6 +657,12 @@ function App() {
             >
               {isProcessing ? 'Analyzing your expression...' : `Analyze ${selectedEmotion.name}`}
             </button>
+
+            <EmotionProgress
+              sessionProgress={sessionProgress}
+              probabilitySnapshot={probabilitySnapshot}
+              selectedEmotion={selectedEmotion}
+            />
           </section>
         </main>
       )}
@@ -612,15 +705,44 @@ function App() {
               <div className="breakdown-box">
                 <h3>Probability breakdown</h3>
                 <ul className="probability-list">
-                  {probabilityRows.map(([emotion, probability]) => (
-                    <li key={emotion}>
-                      <span>{emotion}</span>
-                      <div className="probability-bar-track" aria-hidden="true">
-                        <span className="probability-bar" style={{ width: `${Math.max(probability * 100, 4)}%` }} />
-                      </div>
-                      <strong>{(probability * 100).toFixed(1)}%</strong>
-                    </li>
-                  ))}
+                  {probabilityRows.map(({ emotion, score }) => {
+                    const previousScore = probabilitySnapshot?.previous?.[emotion.key];
+                    const hasPreviousScore = Number.isFinite(previousScore);
+                    const delta = hasPreviousScore ? score - previousScore : null;
+                    const theme = getTheme(emotion);
+
+                    return (
+                      <li key={emotion.key} className={selectedEmotion.key === emotion.key ? 'selected-probability' : ''}>
+                        <span>{emotion.name}</span>
+                        <div
+                          className="probability-bar-track"
+                          role="progressbar"
+                          aria-label={`${emotion.name} probability`}
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          aria-valuenow={score}
+                        >
+                          <span
+                            className="probability-bar"
+                            style={{
+                              width: `${Math.max(score, 0)}%`,
+                              '--bar-start': hasPreviousScore ? previousScore / 100 : 0,
+                              '--result-accent': theme.accent,
+                              '--result-glow': theme.glow,
+                            }}
+                          />
+                        </div>
+                        <div className="probability-value">
+                          <strong>{score.toFixed(1)}%</strong>
+                          {hasPreviousScore && (
+                            <small className={delta < 0 ? 'negative-delta' : ''}>
+                              {delta > 0 ? '+' : delta < 0 ? '-' : ''}{Math.abs(delta).toFixed(1)} pts
+                            </small>
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
