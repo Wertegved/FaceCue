@@ -140,13 +140,16 @@ img { display: block; max-width: 100%; }
 .brand-button {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 0;
   border: 0;
   background: transparent;
   color: var(--ink);
   font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: -0.06em;
+  line-height: 1;
+  padding: 0;
 }
 .brand-mark {
   position: relative;
@@ -179,10 +182,13 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
 }
 .facecue-logo {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
-  overflow: visible;
+  display: block;
+  width: clamp(116px, 12vw, 164px);
+  height: auto;
+  max-height: 42px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(103, 212, 209, 0.22));
 }
 .logo-orbit {
   fill: rgba(255,255,255,0.03);
@@ -1091,13 +1097,14 @@ img { display: block; max-width: 100%; }
   flex-wrap: wrap;
   gap: 10px;
 }
-.loading-state {
+.loading-state,
+.analysis-state {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-columns: minmax(72px, 88px) minmax(0, 1fr);
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   margin-top: 18px;
-  padding: 14px 16px;
+  padding: 16px 18px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: rgba(255,255,255,0.02);
@@ -1106,24 +1113,45 @@ img { display: block; max-width: 100%; }
 .analysis-visual {
   display: grid;
   place-items: center;
-  width: 72px;
+  width: 100%;
   min-height: 72px;
+  min-width: 0;
 }
 .analysis-visual .face-visual {
-  width: 52px;
-  height: 52px;
-  flex: 0 0 52px;
+  width: 60px;
+  height: 60px;
+  flex: 0 0 60px;
 }
 .analysis-visual .face-core {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
 }
 .analysis-visual .face-emoji {
-  font-size: 1.8rem;
+  font-size: clamp(1.8rem, 2vw, 2.2rem);
 }
-.analysis-copy { min-width: 0; }
-.analysis-copy strong { display: block; }
-.analysis-copy p { margin: 4px 0 0; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+.analysis-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  gap: 6px;
+  max-width: 100%;
+}
+.analysis-copy strong {
+  display: block;
+  line-height: 1.4;
+  font-size: clamp(0.96rem, 1.5vw, 1.15rem);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.analysis-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
 .status-message {
   margin-top: 16px;
   padding: 12px 14px;
@@ -1282,6 +1310,10 @@ img { display: block; max-width: 100%; }
   pointer-events: none;
   font-size: 1.1rem;
 }
+.footer-brand .facecue-logo {
+  width: clamp(108px, 16vw, 150px);
+  max-height: 32px;
+}
 .footer-brand-block p {
   margin: 12px 0 0;
   color: var(--muted);
@@ -1343,12 +1375,16 @@ img { display: block; max-width: 100%; }
   }
   .emotion-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .hero-visual-wrap { min-height: 320px; }
+  .loading-state { grid-template-columns: minmax(64px, 76px) minmax(0, 1fr); }
   .background-particle:nth-child(n + 91) { display: none; }
 }
 
 @media (max-width: 640px) {
   .app-shell { padding: 14px 14px 28px; }
+  .topbar { gap: 12px; }
   .header-context { display: none; }
+  .brand-button { min-width: 0; }
+  .brand-button .facecue-logo { width: clamp(104px, 34vw, 140px); }
   .page { padding-top: 24px; }
   .hero {
     display: flex;
@@ -1390,7 +1426,13 @@ img { display: block; max-width: 100%; }
   .practice-intro { gap: 10px; }
   .source-choice-group { flex-direction: column; width: 100%; }
   .source-choice-button { width: min(100%, 240px); }
-  .loading-state { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .loading-state {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    padding: 18px 14px;
+  }
+  .analysis-visual { width: 100%; }
   .analysis-copy { width: 100%; }
   .upload-dropzone { min-height: 260px; }
   .result-summary { align-items: flex-start; }

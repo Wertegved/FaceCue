@@ -389,9 +389,8 @@ function App() {
       <div className="ambient ambient-two" />
 
       <header className="topbar">
-        <button type="button" className="brand-button" onClick={() => setStep('home')}>
+        <button type="button" className="brand-button" onClick={() => setStep('home')} aria-label="FaceCue home">
           <FaceCueLogo />
-          <span>FaceCue</span>
         </button>
 
         <div className="header-context">
@@ -636,7 +635,7 @@ function App() {
             </div>
 
             {isProcessing && (
-              <div className="loading-state" aria-live="polite">
+              <div className="loading-state analysis-state" aria-live="polite">
                 <div className="analysis-visual">
                   <FaceCueVisual emotion={selectedEmotion} compact />
                 </div>
@@ -774,7 +773,6 @@ function App() {
           <div className="footer-brand-block">
             <div className="brand-button footer-brand" aria-label="FaceCue home">
               <FaceCueLogo />
-              <span>FaceCue</span>
             </div>
             <p>Practice facial expressions, explore emotional cues, and learn from AI-generated feedback.</p>
           </div>

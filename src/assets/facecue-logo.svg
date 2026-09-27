@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" role="img" aria-label="FaceCue logo">
+  <g transform="translate(6 8)">
+    <circle cx="42" cy="42" r="34" fill="none" stroke="#67d4d1" stroke-width="3" opacity="0.8"/>
+    <path d="M27 43c0-10 6-16 15-16s15 6 15 16v4c0 10-6 17-15 17s-15-7-15-17v-4Z" fill="rgba(255,255,255,0.06)" stroke="#f8f5ff" stroke-width="2.2"/>
+    <circle cx="35.5" cy="42" r="2.6" fill="#67d4d1"/>
+    <circle cx="48.5" cy="42" r="2.6" fill="#67d4d1"/>
+    <path d="M35 52c3 2.8 7.3 2.8 10.5 0" fill="none" stroke="#67d4d1" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M64 20c3.6 2.8 5.9 6.5 6.6 11.2M67 14c5.1 3.8 8.8 9.4 9.5 15.6" fill="none" stroke="#67d4d1" stroke-width="2.2" stroke-linecap="round" opacity="0.8"/>
+  </g>
+  <text x="112" y="72" fill="#f8f5ff" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="700" letter-spacing="-2">FaceCue</text>
+</svg>
