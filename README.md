@@ -2,7 +2,7 @@
 
 Practice the expression. Feel the difference.
 
-![FaceCue website screenshot](https://raw.githubusercontent.com/Wertegved/FaceCue/auth/screenshot/Screenshot%202026-10-11%20170628.png)
+![FaceCue website screenshot](https://raw.githubusercontent.com/Wertegved/FaceCue/main/screenshot/Screenshot%202026-10-11%20170628.png)
 
 FaceCue is an interactive facial-expression practice app. Choose an emotion, upload a saved photo or capture one with your device camera, and let the AI analyze how the expression is interpreted. FaceCue presents the predicted emotion and probability breakdown, then provides coaching feedback to help guide another attempt.
 
