@@ -1,130 +1,130 @@
-# FaceCue
+﻿# FaceCue
 
 Practice the expression. Feel the difference.
 
-![FaceCue website screenshot](https://raw.githubusercontent.com/Wertegved/FaceCue/main/screenshot/Screenshot%202026-10-11%20170628.png)
+FaceCue is an interactive facial-expression practice app that helps users learn, compare, and improve their expressions using AI-powered emotion analysis and personalized feedback.
 
-FaceCue is an interactive facial-expression practice app. Choose an emotion, upload a saved photo or capture one with your device camera, and let the AI analyze how the expression is interpreted. FaceCue presents the predicted emotion and probability breakdown, then provides coaching feedback to help guide another attempt.
-
-FaceCue is a practice and learning tool, not a clinical or diagnostic system.
+<p align="center">
+  <img src="./screenshot/Tech-Stack.png" alt="FaceCue tech stack" width="820" />
+</p>
 
 ## Overview
 
 FaceCue helps users practice recognizing and producing facial expressions by combining image analysis, emotion prediction, and guided coaching. The app is designed for learning and experimentation, with an emphasis on feedback and repeated attempts rather than diagnosis.
 
-## Features
+## Why FaceCue?
 
-- Seven target emotions: Happy, Sad, Angry, Fear, Surprise, Neutral, and Disgust.
-- Photo or camera input: Select an image from your device or capture a photo live in the browser.
-- AI emotion analysis: Detects a face, aligns it for inference, and returns an emotion prediction with a probability breakdown.
-- Personalized practice feedback: Generates guidance based on the analysis and the emotion the user chose to practice.
-- Session progress: Tracks emotion scores and compares repeated attempts during the current browser tab session.
-- Expression previews: View a concise guide for each emotion before practicing.
-- Responsive interface: A motion-rich, emotion-responsive UI with accessibility and reduced-motion considerations.
+Many people want to understand how expressions are interpreted, but most tools only tell them the result without actionable guidance. FaceCue bridges that gap by pairing prediction with coaching feedback, making it easier to compare the target expression with the observed one.
+
+## Key Features
+
+- 7 target emotions: Happy, Sad, Angry, Fear, Surprise, Neutral, and Disgust
+- Image upload or live camera capture
+- Face detection and landmark-based alignment
+- Emotion prediction with probability breakdowns
+- Personalized coaching feedback based on the selected target emotion
+- Session-based progress tracking for repeated attempts
+- Responsive UI with motion-aware interactions
 
 ## How It Works
 
-1. Choose an emotion to practice.
-2. Preview the expression guide, if helpful.
-3. Practice by choosing an existing image or taking a photo with the camera.
-4. Analyze the image to receive the predicted emotion and probability scores.
-5. Improve with coaching feedback and session progress comparisons on subsequent attempts.
+1. Select the emotion you want to practice.
+2. View a quick expression guide if helpful.
+3. Upload a photo or capture one with the camera.
+4. FaceCue analyzes the image and predicts the most likely emotion.
+5. Review the probability distribution and coaching feedback.
+6. Try again and compare your session progress over time.
 
 ## Tech Stack
 
 ### Frontend
-
 - React
 - Vite
-- JavaScript and CSS
-- Browser Camera API (getUserMedia)
-- sessionStorage for session-only progress history
+- JavaScript
+- CSS
+- Browser Camera API
+- sessionStorage for temporary session tracking
 
-### Backend and AI
+### Backend
+- Python
+- FastAPI
+- Uvicorn
+- SQLAlchemy
+- PostgreSQL-compatible async database support
+- JWT + bcrypt-based authentication flow
 
-- Python and FastAPI
-- DDAMFN++ emotion-classification model with PyTorch
-- OpenCV for image processing
-- MediaPipe Face Landmarker for facial landmarks
-- Groq API (OpenAI-compatible client) for generated coaching feedback
-- SQLAlchemy and PostgreSQL-compatible async database support for account features
+### AI and Vision
+- PyTorch
+- TorchVision
+- OpenCV
+- MediaPipe Face Landmarker
+- scikit-image
+- NumPy
+- DDAMFN++ emotion classification model
 
-## Getting Started
+### AI Feedback
+- Groq API
+- OpenAI-compatible client patterns
+- HTTP-based integration for coaching responses
+
+## Screenshots
+
+<div align="center">
+  <img src="./screenshot/Tech-Stack.png" alt="FaceCue tech stack diagram" width="430" />
+  <img src="./screenshot/Screenshot%202026-10-11%20170628.png" alt="FaceCue application preview" width="430" />
+</div>
+
+## Quick Start
 
 ### Prerequisites
 
-- Python and pip
+- Python 3.10+
 - Node.js and npm
-- PostgreSQL or another database URL supported by the configured backend
-- The project's model assets, including ddamfn/weights/rafdb.pth and face_landmarker.task
-- A Groq API key for coaching feedback
+- A Groq API key
+- Optional: PostgreSQL connection URL for backend auth/database features
 
-### 1. Clone the repository
+### 1) Clone the repo
 
 ```bash
-git clone https://github.com/jayssSmm/FaceCue.git
+git clone https://github.com/Wertegved/FaceCue.git
 cd FaceCue
 ```
 
-### 2. Configure environment variables
+### 2) Set up environment variables
 
-Create a local `.env` file based on `.env.example`.
-
-On Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-On macOS/Linux:
+Create a local `.env` file from the example:
 
 ```bash
 cp .env.example .env
 ```
 
-Configure the values needed for your setup. Common settings include:
+Then add values like:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
 MASTER_PROMPT=your_coaching_system_prompt
 DATABASE_URL=postgresql://user:password@localhost:5432/facecue
-JWT_SECRET_KEY=use_a_long_random_secret
+JWT_SECRET_KEY=your_secure_random_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 ```
 
-`GOOGLE_CLIENT_ID` is needed only if Google sign-in is configured. Keep secrets in your local environment and deployment settings; never commit real credentials.
-
-### 3. Install backend dependencies
+### 3) Install backend dependencies
 
 ```bash
 python -m venv .venv
-```
-
-Activate the environment, then install requirements:
-
-Windows PowerShell:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
+source .venv/bin/activate  # Windows: .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 ```
 
-macOS/Linux:
-
-```bash
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-```
-
-### 4. Install frontend dependencies
+### 4) Install frontend dependencies
 
 ```bash
 npm install
 ```
 
-### 5. Run the backend and frontend for local development
+### 5) Run the app
 
-Start the API in one terminal:
+Start the API:
 
 ```bash
 uvicorn wsgi:app --reload --host 127.0.0.1 --port 8000
@@ -136,38 +136,35 @@ Set the frontend API base URL in a root `.env.local` file:
 VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
-Then start Vite in another terminal:
+Then start Vite:
 
 ```bash
 npm run dev
 ```
 
-Open the local URL printed by Vite, commonly `http://localhost:5173`.
+Open the local URL shown by Vite, usually `http://localhost:5173`.
 
-### 6. Build the frontend
+### 6) Production build
 
 ```bash
 npm run build
 ```
 
-The Vite configuration outputs the production frontend into templates, which is served by the FastAPI application. For a production-style local run, build the frontend first, then start the backend with Uvicorn.
+## API Overview
 
-## API Flow
+The backend exposes endpoints for:
 
-The frontend uses the existing analysis and feedback endpoints:
-
-- `POST /post/image` ? accepts an image using the multipart field `image` and returns the predicted emotion and emotion probabilities.
-- `POST /response` ? accepts the analysis result and `target_emotion`, then returns coaching feedback.
-- `GET /health` ? basic API health check.
-
-Both uploaded images and camera captures enter the same image-analysis flow.
-
-## Session Progress
-
-FaceCue stores attempt history by emotion in the browser's `sessionStorage`. The progress bars use the model's returned probabilities, and repeated analyses can display the change in percentage points compared with the previous attempt for the same emotion. This history is session-scoped and is not a permanent user record.
+- `POST /post/image` – upload an image and receive emotion predictions
+- `POST /response` – send analysis output and target emotion for coaching feedback
+- `GET /health` – health check endpoint
 
 ## Notes
 
-- Camera access requires a secure context, such as HTTPS or localhost, and the user's permission.
-- Results depend on image quality, face visibility, and the model's predictions.
-- FaceCue is intended for expression practice and educational use; its emotion predictions should not be treated as definitive judgments about a person's internal emotional state.
+- Camera access requires a secure context such as localhost or HTTPS.
+- Prediction quality depends on lighting, face visibility, and image clarity.
+- Results should be treated as educational guidance rather than definitive judgments about a person's internal state.
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
+
