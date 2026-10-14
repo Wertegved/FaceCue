@@ -5,7 +5,7 @@ Practice the expression. Feel the difference.
 FaceCue is an interactive facial-expression practice app that helps users learn, compare, and improve their expressions using AI-powered emotion analysis and personalized feedback.
 
 <p align="center">
-  <img src="./screenshot/Tech-Stack.png" alt="FaceCue tech stack" width="820" />
+  <img src="./screenshot/Screenshot%202026-10-11%20170628.png" alt="FaceCue website preview" width="920" />
 </p>
 
 ## Overview
@@ -37,6 +37,10 @@ Many people want to understand how expressions are interpreted, but most tools o
 
 ## Tech Stack
 
+<p align="center">
+  <img src="./screenshot/Tech-Stack.png" alt="FaceCue tech stack diagram" width="760" />
+</p>
+
 ### Frontend
 - React
 - Vite
@@ -66,13 +70,6 @@ Many people want to understand how expressions are interpreted, but most tools o
 - Groq API
 - OpenAI-compatible client patterns
 - HTTP-based integration for coaching responses
-
-## Screenshots
-
-<div align="center">
-  <img src="./screenshot/Tech-Stack.png" alt="FaceCue tech stack diagram" width="430" />
-  <img src="./screenshot/Screenshot%202026-10-11%20170628.png" alt="FaceCue application preview" width="430" />
-</div>
 
 ## Quick Start
 
